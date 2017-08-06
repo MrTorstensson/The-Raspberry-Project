@@ -1,6 +1,6 @@
 # This is a small motor driver intended to be used on a raspberry pi
 # Added to GIT by MrTorstensson
-# Feel free to use/reuse and send 
+# Feel free to use/reuse
 
 import RPi.GPIO as GPIO
 
