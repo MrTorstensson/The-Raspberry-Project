@@ -5,7 +5,7 @@
 import RPi.GPIO as GPIO
 
 class Motor:
-
+    """ Will set up a PWM motor control """
     def __init__(self, PORT = [11, 13]):
         """__init__(self, PORT = [11, 13]), Will set up a PWM motor control on PORT = [11, 13] """
         self.FWD = PORT[0]
