@@ -22,8 +22,8 @@ class Bat:
         StartTime = time.time()
         StopTime = time.time()
      
-        # save StartTime
-        while GPIO.input(self.Echo_port) == 0 and StopTime + 1 > StartTime:
+        # save StartTime and watch for trigger error (0.1s timeout).
+        while GPIO.input(self.Echo_port) == 0 and StopTime + 0.1 > StartTime:
             StartTime = time.time()
         # save time of arrival
         while GPIO.input(self.Echo_port) == 1:
@@ -36,6 +36,7 @@ class Bat:
         # multiply with the sonic speed (343 m/s)
         # and divide by 2, because there and back
         distance = (TimeElapsed * 343) / 2
+        # if measurment is larger then 5.
         if distance > 5:
             return False
         return distance
@@ -45,12 +46,17 @@ class Bat:
         return valu is the mean of the remaining samples"""
         Values = []
         while len(Values) < sample:
-            Read = self.distance()
-            if Read:
-                Values.append(Read)
+            Values.append(self.distance())
         Values.sort()
         Select = Values[remove:-remove]
         return sum(Select)/len(Select)
+
+    def Test(self, Time = 10):
+        Values = []
+        StartTime = time.time()
+        while time.time() < (StartTime + Time):
+            Values.append(self.distance())
+        return("%s measurements within %s seconds. Average rate  %s Hz" %(len(Values), Time, len(Values)/Time))
 
     def close(self):
         GPIO.cleanup([self.Trigger_port, self.Echo_port])
