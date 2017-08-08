@@ -27,7 +27,7 @@ class Xbox_One:
             0x03 : 'rx',
             0x04 : 'ry',
             0x05 : 'rt',
-            0x06 : 'trottle',
+            0x06 : 'throttle',
             0x07 : 'rudder',
             0x08 : 'wheel',
             0x09 : 'gas',
@@ -90,10 +90,14 @@ class Xbox_One:
             0x2c3 : 'dpad_down',
         }
 
+        # Check if joystick device exists
+        if (not os.path.exists(JS)):
+            print('Game controller not found (%s), is it connected?' % JS)
+            exit()
+
         # Open the joystick device.
-        fn = '/dev/input/js0'
-        print('Opening %s...' % fn)
-        self.jsdev = open(fn, 'rb')
+        print('Opening %s...' % JS)
+        self.jsdev = open(JS, 'rb')
 
         # Get the device name.
         buf = array.array('B', [0] * 64)
@@ -159,5 +163,6 @@ class Xbox_One:
 
     def close(self):
         self.Running = False
+        self.jsdev.close()
 
         
