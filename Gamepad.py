@@ -45,6 +45,11 @@ class Xbox_One:
             0x13e : 'rsp',      #Right Stick Press
         }
 
+        # Check if joystick device exists
+        if (not os.path.exists(JS)):
+            print('Game controller not found (%s), is it connected?' % JS)
+            exit()
+
         # Open the joystick device.
         print('Opening %s...' % JS)
         self.jsdev = open(JS, 'rb')
@@ -115,5 +120,6 @@ class Xbox_One:
 
     def close(self):
         self.Running = False
+        self.jsdev.close()
 
         
