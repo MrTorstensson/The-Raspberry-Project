@@ -21,79 +21,33 @@ class Xbox_One:
 
         # These constants were borrowed from linux/input.h and modified for the names on the Xbox One control
         axis_names = {
-            0x00 : 'lx',
-            0x01 : 'ly',
-            0x02 : 'lt',
-            0x03 : 'rx',
-            0x04 : 'ry',
-            0x05 : 'rt',
-            0x06 : 'trottle',
-            0x07 : 'rudder',
-            0x08 : 'wheel',
-            0x09 : 'gas',
-            0x0a : 'brake',
-            0x10 : 'hat0x',
-            0x11 : 'hat0y',
-            0x12 : 'hat1x',
-            0x13 : 'hat1y',
-            0x14 : 'hat2x',
-            0x15 : 'hat2y',
-            0x16 : 'hat3x',
-            0x17 : 'hat3y',
-            0x18 : 'pressure',
-            0x19 : 'distance',
-            0x1a : 'tilt_x',
-            0x1b : 'tilt_y',
-            0x1c : 'tool_width',
-            0x20 : 'volume',
-            0x28 : 'misc',
+            0x00 : 'lsx',       #Left Stick X
+            0x01 : 'lsy',       #Left Stick Y
+            0x02 : 'lt',        #Left Throttle
+            0x03 : 'rsx',       #Right Stick X
+            0x04 : 'rsy',       #Right Stick Y
+            0x05 : 'rt',        #Right Throttle
+            0x10 : 'dpx',       # Directional Pad X
+            0x11 : 'dpy',       # Directional Pad X
         }
 
         button_names = {
-            0x120 : 'trigger',
-            0x121 : 'thumb',
-            0x122 : 'thumb2',
-            0x123 : 'top',
-            0x124 : 'top2',
-            0x125 : 'pinkie',
-            0x126 : 'base',
-            0x127 : 'base2',
-            0x128 : 'base3',
-            0x129 : 'base4',
-            0x12a : 'base5',
-            0x12b : 'base6',
-            0x12f : 'dead',
-            0x130 : 'a',
-            0x131 : 'b',
-            0x132 : 'c',
-            0x133 : 'x',
-            0x134 : 'y',
-            0x135 : 'z',
-            0x136 : 'lb',
-            0x137 : 'rb',
-            0x138 : 'tl2',
-            0x139 : 'tr2',
-            0x13a : 'select',
-            0x13b : 'start',
-            0x13c : 'Xbox',
-            0x13d : 'thumbl',
-            0x13e : 'thumbr',
-            #Pads
-            0x220 : 'dpad_up',
-            0x221 : 'dpad_down',
-            0x222 : 'dpad_left',
-            0x223 : 'dpad_right',
-            # XBox 360 controller uses these codes.
-            0x2c0 : 'dpad_left',
-            0x2c1 : 'dpad_right',
-            0x2c2 : 'dpad_up',
-            0x2c3 : 'dpad_down',
+            0x130 : 'a',        #A button
+            0x131 : 'b',        #B button
+            0x133 : 'x',        #X button
+            0x134 : 'y',        #Y button
+            0x136 : 'lb',       #Left Bump
+            0x137 : 'rb',       #Right Bump
+            0x13a : 'View',       #View Button
+            0x13b : 'Menu',       #Menu Button
+            0x13c : 'Xbox',     #Xbox Tag button
+            0x13d : 'lsp',      #Left Stick Press
+            0x13e : 'rsp',      #Right Stick Press
         }
 
         # Open the joystick device.
-        fn = '/dev/input/js0'
-        print('Opening %s...' % fn)
-        self.jsdev = open(fn, 'rb')
+        print('Opening %s...' % JS)
+        self.jsdev = open(JS, 'rb')
 
         # Get the device name.
         buf = array.array('B', [0] * 64)
@@ -115,7 +69,7 @@ class Xbox_One:
         for axis in buf[:num_axes]:
             axis_name = axis_names.get(axis, 'unknown(0x%02x)' % axis)
             self.axis_map.append(axis_name)
-            self.Key_states[axis_name] = 0.0
+            self.Key_states[axis_name] = 0
 
         # Get the button map.
         buf = array.array('H', [0] * 200)
@@ -150,8 +104,10 @@ class Xbox_One:
                     #print('%s:%s' %(self.button_map[number], self.Key_states[self.button_map[number]]))
                 #If Throttle
                 elif type & 0x02:
-                    value = value/32676.0
-                    self.Key_states[self.axis_map[number]] = value
+                    if self.axis_map[number] in  ['lt', 'rt']:
+                        self.Key_states[self.axis_map[number]] = int((value+32767)/32767*100/2)
+                    else:
+                        self.Key_states[self.axis_map[number]] = int((value)/32767*100)
                     #print('%s:%s' %(self.axis_map[number], self.Key_states[self.axis_map[number]]))
         print("Xbox_One update stopped, Reinitialize controller to start update")
         exit()
