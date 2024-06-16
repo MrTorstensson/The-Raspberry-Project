@@ -1,5 +1,5 @@
 # Write Driver description here
-# By Hannes
+# By Hanna
 
 import Motor
 
